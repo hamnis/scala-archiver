@@ -19,8 +19,10 @@ object IO {
 
   def extension(file: File): Option[String] = {
     val name = file.getName
-    val dotIndex = name.lastIndexOf(".")
-    if (dotIndex != -1) Some(name.substring(dotIndex + 1)) else None 
+    val afterLastSlash = name.substring(name.lastIndexOf('/') + 1)
+    val afterLastBackslash = afterLastSlash.lastIndexOf('\\') + 1
+    val dotIndex = afterLastSlash.indexOf('.', afterLastBackslash)
+    if (dotIndex == -1) None else  Some(afterLastSlash.substring(dotIndex + 1))
   }
 
   def transfer(file: File, os: OutputStream) = Files.copy(file.toPath, os)

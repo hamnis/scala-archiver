@@ -2,18 +2,21 @@ package archiver
 
 import java.io.File
 
-sealed abstract class Packaging(val extension: String)
-object Packaging {
-  case object Zip extends Packaging("zip")
-  case object Directory extends Packaging("")
-  case object TarGz extends Packaging("tgz")
+sealed trait Packaging
 
-  def apply(file: File) = {    
-    IO.extension(file).getOrElse("") match {
-      case Zip.extension => Zip
-      case TarGz.extension => TarGz
-      case Directory.extension => Directory
-      case z => sys.error("Unknown packaging" + z)
+object Packaging {
+  case object Zip extends Packaging
+  case object Directory extends Packaging
+  case object TarGz extends Packaging
+
+  def apply(file: File): Packaging =
+    if (file.isDirectory || IO.extension(file).isEmpty) {
+      Directory
+    } else {
+      IO.extension(file).getOrElse("") match {
+        case "zip"            => Zip
+        case "tar.gz" | "tgz" => TarGz
+        case z                => sys.error("Unknown packaging: " + z)
+      }
     }
-  }
 }
