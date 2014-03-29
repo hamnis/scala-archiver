@@ -17,12 +17,13 @@ object IO {
     } else Nil
   }
 
-  def extension(file: File): Option[String] = {
-    val name = file.getName
+  def extension(file: File): Option[String] = extension(file.getName)
+  
+  def extension(name: String): Option[String] = {
     val afterLastSlash = name.substring(name.lastIndexOf('/') + 1)
     val afterLastBackslash = afterLastSlash.lastIndexOf('\\') + 1
     val dotIndex = afterLastSlash.indexOf('.', afterLastBackslash)
-    if (dotIndex == -1) None else  Some(afterLastSlash.substring(dotIndex + 1))
+    if (dotIndex == -1) None else Some(afterLastSlash.substring(dotIndex + 1))
   }
 
   def transfer(file: File, os: OutputStream) = Files.copy(file.toPath, os)
