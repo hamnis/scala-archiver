@@ -6,9 +6,10 @@ import java.nio.file._
 import java.nio.file.attribute.PosixFilePermission
 
 object IO {
-  def listFiles(file: File): List[File] = {
+  def listFiles(file: File, glob: Option[String] = None): List[File] = {
     if (file.isDirectory) {
-      val stream = Files.newDirectoryStream(file.toPath)
+      val stream = glob.map(g => Files.newDirectoryStream(file.toPath, g)).
+          getOrElse(Files.newDirectoryStream(file.toPath))
       try {
         stream.iterator.asScala.map(_.toFile).toList
       } finally {
@@ -27,7 +28,7 @@ object IO {
   }
 
   def move(src: File, target: File) {
-    Files.move(src.toPath, target.toPath, StandardCopyOption.COPY_ATTRIBUTES)
+    Files.move(src.toPath, target.toPath)
   }
 
   def copy(file: File, os: OutputStream){
@@ -35,24 +36,33 @@ object IO {
   } 
 
   def copy(src: File, target: File) {
-    Files.copy(src.toPath, target.toPath, StandardCopyOption.COPY_ATTRIBUTES)
+    if (src.isDirectory) {
+      createDirectory(target)
+    } else {
+      createDirectory(target.getParentFile)
+      Files.copy(src.toPath, target.toPath, StandardCopyOption.COPY_ATTRIBUTES)
+    }
   }
 
   def getPermissions(file: File): FilePermissions = {
     new FilePermissions(Files.getPosixFilePermissions(file.toPath).asScala.toSet[PosixFilePermission])
   }
+  def setPermissions(file: File, perms: FilePermissions) {
+    Files.setPosixFilePermissions(file.toPath, perms.permissions.asJava)
+  }
 
   def createDirectory(file: File) = Files.createDirectories(file.toPath)
 
-  def setExecutable(file: File, executable: Boolean) = {    
-    val perms = getPermissions(file)
-    val updated = if (executable) {
-      perms.add(FilePermissions.exec)  
+  def setExecutable(file: File, executable: Boolean) = {
+    if (Files.isRegularFile(file.toPath)) {
+      val perms = getPermissions(file)
+      val updated = if (executable) {
+        perms.add(FilePermissions.exec)
+      }
+      else {
+        perms.remove(FilePermissions.exec)
+      }
+      setPermissions(file, perms)
     }
-    else {
-      perms.remove(FilePermissions.exec)
-    }
-    
-    Files.setPosixFilePermissions(file.toPath, updated.permissions.asJava)
   }
 }

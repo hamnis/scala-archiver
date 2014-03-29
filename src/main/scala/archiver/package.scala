@@ -4,6 +4,7 @@ package object archiver {
   implicit class FileOps(val file: File) extends AnyVal {
     def /(name: String): File = new File(file, name)
     def permissions: FilePermissions = IO.getPermissions(file)
+    def setPermissions(p: FilePermissions) = IO.setPermissions(file, p)
     def setExecutable(enable: Boolean) = IO.setExecutable(file, enable)
   }
 

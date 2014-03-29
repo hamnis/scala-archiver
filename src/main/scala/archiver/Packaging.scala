@@ -4,7 +4,7 @@ import java.io.File
 
 sealed trait Packaging
 
-object Packaging {
+object Packaging extends ((File) => Packaging){
   case object Zip extends Packaging
   case object Directory extends Packaging
   case object TarGz extends Packaging
