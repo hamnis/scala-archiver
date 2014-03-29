@@ -44,7 +44,7 @@ object ZipArchiver extends CommonsArchiver {
     entries.foreach{case (f, e) =>
       os.putArchiveEntry(e)
       if (f.isFile) {
-        IO.transfer(f, os)
+        IO.copy(f, os)
       }
       os.closeArchiveEntry()
     }
@@ -73,7 +73,7 @@ object TarArchiver extends CommonsArchiver {
       entries.foreach{case (f, e) =>
         tar.putArchiveEntry(e)
         if (f.isFile) {
-          IO.transfer(f, tar)
+          IO.copy(f, tar)
         }
         tar.closeArchiveEntry()
       }  
@@ -83,7 +83,7 @@ object TarArchiver extends CommonsArchiver {
 
     val gzip = new GzipCompressorOutputStream(new FileOutputStream(output))
     try {
-      IO.transfer(temp, gzip)
+      IO.copy(temp, gzip)
     } finally {
       gzip.close()
     }

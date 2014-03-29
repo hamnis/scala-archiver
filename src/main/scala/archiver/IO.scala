@@ -26,7 +26,7 @@ object IO {
     if (dotIndex == -1) None else Some(afterLastSlash.substring(dotIndex + 1))
   }
 
-  def transfer(file: File, os: OutputStream) = Files.copy(file.toPath, os)
+  def copy(file: File, os: OutputStream) = Files.copy(file.toPath, os)
 
   def copy(src: File, target: File) = {
     Files.copy(src.toPath, target.toPath, StandardCopyOption.COPY_ATTRIBUTES)
