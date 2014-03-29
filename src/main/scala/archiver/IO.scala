@@ -18,7 +18,7 @@ object IO {
   }
 
   def extension(file: File): Option[String] = extension(file.getName)
-  
+
   def extension(name: String): Option[String] = {
     val afterLastSlash = name.substring(name.lastIndexOf('/') + 1)
     val afterLastBackslash = afterLastSlash.lastIndexOf('\\') + 1
@@ -38,8 +38,15 @@ object IO {
 
   def createDirectory(file: File) = Files.createDirectories(file.toPath)
 
-  def setExecutable(file: File) = {
-    val p = FilePermissions(Integer.decode("0755"))
-    p.foreach(perm => Files.setPosixFilePermissions(file.toPath, perm.permissions.asJava))
+  def setExecutable(file: File, executable: Boolean) = {    
+    val perms = getPermissions(file)
+    val updated = if (executable) {
+      perms.add(FilePermissions.exec)  
+    }
+    else {
+      perms.remove(FilePermissions.exec)
+    }
+    
+    Files.setPosixFilePermissions(file.toPath, updated.permissions.asJava)
   }
 }

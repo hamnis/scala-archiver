@@ -2,7 +2,7 @@ package archiver
 
 import scala.util.Try
 import scala.collection.JavaConverters._
-import java.nio.file.attribute.{PosixFilePermissions, PosixFilePermission}
+import java.nio.file.attribute.{PosixFilePermissions, PosixFilePermission}, PosixFilePermission._
 
 case class FilePermissions(permissions: Set[PosixFilePermission]) {
   def toInt = {
@@ -11,6 +11,22 @@ case class FilePermissions(permissions: Set[PosixFilePermission]) {
   }
 
   override val toString = PosixFilePermissions.toString(permissions.asJava)
+
+  def add(p: FilePermissions) = {
+    copy(permissions = permissions ++ p.permissions)
+  }
+
+  def add(p: PosixFilePermission*) = {
+   copy(permissions = permissions ++ p) 
+  }
+
+  def remove(p: FilePermissions) = {
+    copy(permissions = permissions -- p.permissions)
+  }
+
+  def remove(p: PosixFilePermission*) = {
+   copy(permissions = permissions -- p) 
+  }
 }
 
 object FilePermissions {
@@ -24,6 +40,9 @@ object FilePermissions {
     "rw-" -> '6',
     "rwx" -> '7'
   )
+
+  private[archiver] val exec = FilePermissions(Set(OWNER_EXECUTE, GROUP_EXECUTE, OTHERS_EXECUTE))
+
 
   def apply(in: String): Option[FilePermissions] = Try { 
     FilePermissions(PosixFilePermissions.fromString(in).asScala.toSet[PosixFilePermission]) 

@@ -3,6 +3,8 @@ package object archiver {
   
   implicit class FileOps(val file: File) extends AnyVal {
     def /(name: String): File = new File(file, name)
+    def permissions: FilePermissions = IO.getPermissions(file)
+    def setExecutable(enable: Boolean) = IO.setExecutable(file, enable)
   }
 
   implicit class MapOps[K, V](val map: Map[K, V]) extends AnyVal {
