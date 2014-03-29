@@ -6,14 +6,21 @@ import java.io.File
 class FileMappingTest extends FunSuite with Matchers {
   test("File mapping in src/main") {
     val f = new File(getRoot(), "src/main")
-    val mapping = FileMapping(f)
+    val mapping = FileMapping(List(f))
+    assert(!mapping.isEmpty)
+    mapping.foreach{case (n, _) => n should startWith ("scala") }
+  }
+  
+  test("File mapping in src/main and src/test") {
+    val root = getRoot()
+    val mapping = FileMapping(List(new File(root, "src/main"), new File(root, "src/test")))
     assert(!mapping.isEmpty)
     mapping.foreach{case (n, _) => n should startWith ("scala") }
   }
 
   test("File mapping in src/main with custom root ") {
     val f = new File(getRoot(), "src/main")
-    val mapping = FileMapping(f, Some("custom"))
+    val mapping = FileMapping(List(f), Some("custom"))
     assert(!mapping.isEmpty)
     mapping.foreach{case (n, _) => n should startWith ("custom/scala") }
   }

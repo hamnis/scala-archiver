@@ -5,17 +5,18 @@ import java.io.File
 case class FileMapping(mappings: Map[String, File], permissions: Map[String, FilePermissions]) {
   def size = mappings.size
   def isEmpty = mappings.isEmpty
+  def append(fm: FileMapping) = copy(mappings = mappings ++ fm.mappings, permissions = permissions ++ fm.permissions)
   def foreach(f: ((String, File)) => Unit): Unit = mappings.foreach(f)
   def map[B](f: ((String, File)) => B): Iterable[B] = mappings.map(f)
 }
 
 object FileMapping {
-  def apply(root: File, base: Option[String] = None, permissions: Map[String, FilePermissions] = Map.empty): FileMapping = {
-    def name(f: File) = base.map(_ + "/").getOrElse("") + f.getAbsolutePath.substring(root.getAbsolutePath.length).drop(1)
+  def apply(roots: List[File], base: Option[String] = None, permissions: Map[String, FilePermissions] = Map.empty): FileMapping = {
+    def name(f: File, root: File) = base.map(_ + "/").getOrElse("") + f.getAbsolutePath.substring(root.getAbsolutePath.length).drop(1)
     def entries(f: File): Seq[File] = f :: IO.listFiles(f).flatMap(entries)
-    def tuple(root: File) = (f: File) => name(f) -> f
+    def tuple(root: File) = (f: File) => name(f, root) -> f
     
-    val mappings = entries(root).tail.map(tuple(root)).toMap
+    val mappings = roots.flatMap(root => entries(root).tail.map(tuple(root))).toMap
     new FileMapping(mappings, applyPermissions(mappings, permissions))
   }
 
