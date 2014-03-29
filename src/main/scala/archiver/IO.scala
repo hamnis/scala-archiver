@@ -26,9 +26,15 @@ object IO {
     if (dotIndex == -1) None else Some(afterLastSlash.substring(dotIndex + 1))
   }
 
-  def copy(file: File, os: OutputStream) = Files.copy(file.toPath, os)
+  def move(src: File, target: File) {
+    Files.move(src.toPath, target.toPath, StandardCopyOption.COPY_ATTRIBUTES)
+  }
 
-  def copy(src: File, target: File) = {
+  def copy(file: File, os: OutputStream){
+    Files.copy(file.toPath, os)
+  } 
+
+  def copy(src: File, target: File) {
     Files.copy(src.toPath, target.toPath, StandardCopyOption.COPY_ATTRIBUTES)
   }
 
