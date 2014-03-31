@@ -32,7 +32,13 @@ object DirectoryArchiver extends Archiver {
       val target = output / name
       IO.copy(file, target)
     }
-    logger.warn("Ignoring permissions")
+    logger.debug("Copied all files to " + output)
+    logger.debug("Setting permissions")
+    mapping.permissions.foreach{ case (name, p) =>
+      val target = output / name
+      target.setPermissions(p)
+    }
+    logger.debug("Done setting permissions")    
     output
   }
 }
