@@ -28,7 +28,7 @@ object IO {
   }
 
   def move(src: File, target: File) {
-    Files.move(src.toPath, target.toPath)
+    Files.move(src.toPath, target.toPath, StandardCopyOption.REPLACE_EXISTING)
   }
 
   def copy(file: File, os: OutputStream){
