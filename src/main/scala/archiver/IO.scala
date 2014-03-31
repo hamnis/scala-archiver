@@ -3,7 +3,7 @@ package archiver
 import collection.JavaConverters._
 import java.io.{File, OutputStream}
 import java.nio.file._
-import java.nio.file.attribute.PosixFilePermission
+import java.nio.file.attribute.{PosixFilePermission, BasicFileAttributes}
 
 object IO {
   def listFiles(file: File, glob: Option[String] = None): List[File] = {
@@ -53,6 +53,10 @@ object IO {
 
   def createDirectory(file: File) = Files.createDirectories(file.toPath)
 
+  def delete(file: File) {
+    Files.walkFileTree(file.toPath, DeletingFileVisitor)
+  }
+
   def setExecutable(file: File, executable: Boolean) = {
     if (Files.isRegularFile(file.toPath)) {
       val perms = getPermissions(file)
@@ -63,6 +67,22 @@ object IO {
         perms.remove(FilePermissions.exec)
       }
       setPermissions(file, perms)
+    }
+  }
+}
+
+object DeletingFileVisitor extends SimpleFileVisitor[Path]() {
+  override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+     Files.delete(file)
+     FileVisitResult.CONTINUE
+  }
+  override def postVisitDirectory(dir: Path, e: java.io.IOException) = {
+    if (e == null) {
+      Files.delete(dir)
+      FileVisitResult.CONTINUE
+    } else {
+      // directory iteration failed
+      throw e
     }
   }
 }

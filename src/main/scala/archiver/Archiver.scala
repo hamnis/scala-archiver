@@ -24,6 +24,9 @@ trait Archiver extends Logging {
 
 object DirectoryArchiver extends Archiver {
   def create(mapping: FileMapping, output: File) = {
+    if (output.exists) {
+      IO.delete(output)
+    }
     IO.createDirectory(output)
     mapping.foreach { case (name, file) =>
       val target = output / name
