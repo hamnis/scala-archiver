@@ -8,6 +8,12 @@ class FileMapping private(val mappings: Map[String, File], val permissions: Map[
   def append(fm: FileMapping) = new FileMapping(mappings ++ fm.mappings, permissions ++ fm.permissions)
   def foreach(f: ((String, File)) => Unit): Unit = mappings.foreach(f)
   def map[B](f: ((String, File)) => B): Iterable[B] = mappings.map(f)
+
+  override def toString = {
+    s"""mappings: $mappings
+        |permissions: $permissions
+    """.stripMargin
+  }
 }
 
 object FileMapping {
@@ -15,7 +21,6 @@ object FileMapping {
     def name(f: File, root: File) = base.map(_ + "/").getOrElse("") + f.getAbsolutePath.substring(root.getAbsolutePath.length).drop(1)
     def entries(f: File): Seq[File] = f :: IO.listFiles(f, glob).flatMap(entries)
     def tuple(root: File) = (f: File) => name(f, root) -> f
-    
     val mappings = roots.flatMap(root => entries(root).tail.map(tuple(root))).toMap
     new FileMapping(mappings, resolver.resolve(mappings, permissions))
   }

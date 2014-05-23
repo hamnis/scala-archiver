@@ -21,10 +21,19 @@ object IO {
   def extension(file: File): Option[String] = extension(file.getName)
 
   def extension(name: String): Option[String] = {
-    val afterLastSlash = name.substring(name.lastIndexOf('/') + 1)
-    val afterLastBackslash = afterLastSlash.lastIndexOf('\\') + 1
-    val dotIndex = afterLastSlash.indexOf('.', afterLastBackslash)
-    if (dotIndex == -1) None else Some(afterLastSlash.substring(dotIndex + 1))
+    val dotIndex = name.lastIndexOf('.')
+    if (dotIndex == -1) None else {
+      val e = name.substring(dotIndex + 1)
+      if (e == "gz") {
+        val base = name.substring(0, dotIndex)
+        extension(base) match {
+          case Some("tar") => Some("tar.gz")
+          case Some(n) => Some(e)
+          case None => Some(e)
+        }
+      }
+      else Some(e)
+    }    
   }
 
   def move(src: File, target: File) {
