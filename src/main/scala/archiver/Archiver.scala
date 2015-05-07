@@ -1,10 +1,17 @@
 package archiver
 
 import java.io.File
-import org.slf4j.LoggerFactory
 
-trait Logging {
-  val logger = LoggerFactory.getLogger(getClass)
+trait Logger {
+  def debug(msg: String): Unit
+  def info(msg: String): Unit
+}
+
+object Logger {
+  implicit object ConsoleLogger extends Logger {
+    def debug(msg: String) = Console.out.println("[DEBUG] %s".format(msg))
+    def info(msg: String) = Console.out.println("[INFO] %s".format(msg))
+  }
 }
 
 object Archiver {
@@ -18,12 +25,12 @@ object Archiver {
   }
 }
 
-trait Archiver extends Logging {
-  def create(mapping: FileMapping, output: File): File
+trait Archiver {
+  def create(mapping: FileMapping, output: File)(implicit logger: Logger): File
 }
 
 object DirectoryArchiver extends Archiver {
-  def create(mapping: FileMapping, output: File) = {
+  def create(mapping: FileMapping, output: File)(implicit logger: Logger) = {
     if (output.exists) {
       IO.delete(output)
     }

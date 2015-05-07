@@ -10,7 +10,7 @@ trait CommonsArchiver extends Archiver {
   type ZE <: ArchiveEntry
   type ZO <: ArchiveOutputStream
   
-  def create(mapping: FileMapping, output: File): File = {
+  def create(mapping: FileMapping, output: File)(implicit logger: Logger): File = {
     val containerDirectory = output.getAbsoluteFile.getParentFile
     if (!containerDirectory.exists) {
       IO.createDirectory(containerDirectory)
