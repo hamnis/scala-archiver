@@ -2,10 +2,10 @@ organization := "net.hamnaberg"
 
 name := "scala-archiver"
 
-scalaVersion := "2.11.6"
+crossScalaVersions := Seq("2.12.4", "2.11.12", "2.10.7")
 
-crossScalaVersions := Seq("2.11.6", "2.10.5")
+scalaVersion := crossScalaVersions.value.head
 
-libraryDependencies += "org.apache.commons" % "commons-compress" % "1.9"
+libraryDependencies += "org.apache.commons" % "commons-compress" % "1.15"
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test"
